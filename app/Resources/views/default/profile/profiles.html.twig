@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+{% block header %}{% include 'default/navbars/administrator.html.twig' %}{% endblock %}
+
+{% block body %}
+
+    <div class="card border-primary mb-3">
+
+        {% include 'default/dialogs/messagesend.html.twig' %}
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Profiles</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarColor03">
+                <form class="form-inline my-2 my-lg-0" method="post" action="{{ path('profiles_page') }}">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <ul class="navbar-nav mr-auto col-sm-6">
+                                <li class="nav-item active mt-2">
+                                    <input name="firstName" class="form-control mr-sm-2" type="text"
+                                           placeholder="First name"
+                                           value="{% if searchFields['firstName'] is defined %}{{ searchFields['firstName'] }}{% endif %}">
+                                </li>
+                                <li class="nav-item mt-2">
+                                    <input name="email" class="form-control mr-sm-2" type="text"
+                                           placeholder="email"
+                                           value="{% if searchFields['email'] is defined %}{{ searchFields['email'] }}{% endif %}">
+                                </li>
+                                <li class="nav-item mt-2">
+                                    <input name="phone" class="form-control mr-sm-2" type="text"
+                                           placeholder="phone"
+                                           value="{% if searchFields['phone'] is defined %}{{ searchFields['phone'] }}{% endif %}">
+                                </li>
+                                <li class="nav-item mr-md-3 mt-2">
+                                    <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </nav>
+        <hr class="my-4">
+        <h1 class="display-8">Profiles</h1>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">FirstName</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Type</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in profiles %}
+                <tr style="cursor: pointer" class="table-default clickable-row">
+                    <th scope="row">{{ item['firstName'] }}</th>
+                    <td>{{ item['email'] }}</td>
+                    <td>{{ item['phone'] }}</td>
+                    <td>{{ item['userType'] }}</td>
+
+                    {% if item['blocked'] is defined and item['blocked'] != true %}
+                        <td><a href="{{path('block_profile_page')}}?profileid={{item['id']}}"><button type="button" class="btn btn-danger btn-block" style="margin-bottom: 10px">Block</button></a><br>
+                    {% else %}
+                        <td><a href="{{path('unblock_profile_page')}}?profileid={{item['id']}}"><button type="button" class="btn btn-success btn-block" style="margin-bottom: 10px">Unblock</button></a><br>
+                    {% endif %}
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function($) {
+
+            $("a .btn-block").click(function(e) {
+                e.preventDefault();
+                var self = $(this);
+
+                var url = self.parent().attr('href');
+
+                $.ajax({
+                    url: url,
+                    data: '',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'GET',
+                    success: function (data) {
+
+                        if ($.isPlainObject(data)) {
+                            try {
+                                if (data.success == true) {
+                                    location.reload();
+                                }
+                            } catch (err) {}
+                        }
+
+                    }
+                });
+
+                $('#dialogSendMessageBtn')
+                    .data('href', self.parent().attr('href'));
+                return false;
+            });
+
+            $("#region").change(function (e) {
+
+                var isJsonResponse = false;
+                $cityId = $(this).val();
+                $.ajax({
+                    url: '/districts',
+                    data: 'city_id=' + $cityId,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'GET',
+                    success: function (data) {
+
+                        if ($.isPlainObject(data)) {
+                            isJsonResponse = true;
+                        }
+
+                        if (isJsonResponse) {
+                            $("#district").empty();
+                            $.each(data.data, function(index, item) {
+                                $("#district").append(new Option(item.name, item.id));
+                            })
+                        }
+                    }
+                });
+            });
+
+        });
+    </script>
+
+{% endblock %}
+

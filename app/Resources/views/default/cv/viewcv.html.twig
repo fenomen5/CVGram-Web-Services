@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block header %}
+{% if userType == 'jobseeker'%}
+{% include 'default/navbars/jobseeker.html.twig' %}
+    {% else %}
+{% include 'default/navbars/employer.html.twig' %}
+{% endif %}
+{% endblock %}
+{% block body %}
+
+    <div class="container">
+        <div id="error"></div>
+        {% include 'default/dialogs/messagesend.html.twig' %}
+        <div class="card border-primary mb-3">
+
+            {% if  usercv['cvid'] is defined %}
+                <hr class="my-4">
+                <h1 class="display-8">Cv</h1>
+
+                <div class="d-flex justify-content-end pr-3">
+                    <a href="{{path('send_message_page')}}?from={{usercv['sender']}}&to={{usercv['receiver']}}">
+                        <button type="button" class="btn btn-success btn-message" data-toggle="modal" data-target="#dialogSendMessage" style="margin-bottom: 10px">
+                            Message
+                        </button>
+                    </a>
+                </div>
+                <div class="list-group ml-3">
+                        <h4 class="mb-1">Title </h4>
+                        <h5 class="mb-1 m-3">{{ usercv['cvtitle'] }}</h5>
+                        <h4 class="mb-1">Region</h4>
+                        <h5 class="mb-1 m-3"> {{ usercv['region'] }}</h5>
+                        <h4 class="mb-1">District</h4>
+                        <h5 class="mb-1 m-3"> {{ usercv['district'] }}</h5>
+                        <h4 class="mb-1">Industry</h4>
+                        <h5 class="mb-1 m-3">{{ usercv['industry'] }}</h5>
+                        <h4 class="mb-1">Skills</h4>
+                        <h5 class="mb-1 m-3">{{ usercv['cvskills'] }}</h5>
+
+                        {% if usercv['attachment'] is defined %}
+                        <h4 class="mb-1">Cv attachment</h4>
+                        <h5 class="mb-1">
+                            <a href="{{ path('file_download_page') }}?filename={{ usercv['attachment'] }}">{{ usercv['attachment'] }}</a>
+                        </h5>
+                        {% endif %}
+                </div>
+
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        $(document).ready(function () {
+
+        $("#region").change(function (e) {
+
+            var isJsonResponse = false;
+            $cityId = $(this).val();
+            $.ajax({
+                url: '/districts',
+                data: 'city_id=' + $cityId,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'GET',
+                success: function (data) {
+
+                    if ($.isPlainObject(data)) {
+                        isJsonResponse = true;
+                    }
+
+                    if (isJsonResponse) {
+                        $("#district").empty();
+                        $.each(data.data, function(index, item) {
+                            $("#district").append(new Option(item.name, item.id));
+                        })
+                    }
+                }
+            });
+        });
+            $("a .btn-message").click(function(e) {
+                e.preventDefault();
+
+                var self = $(this);
+                $('#dialogSendMessage').modal({ show: true});
+                $('#dialogSendMessageBtn')
+                    .data('href', self.parent().attr('href'));
+                return false;
+            });
+        });
+    </script>
+{% endblock %}

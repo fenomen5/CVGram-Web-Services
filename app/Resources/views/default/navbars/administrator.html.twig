@@ -1,0 +1,25 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+    <a class="navbar-brand" href="#">CVGram Administrator</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarColor01">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('administrator_dashboard_page') }}">CVs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('profiles_page')}}">Profiles</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('logout_page') }}">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('about_page') }}">About</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+</nav>

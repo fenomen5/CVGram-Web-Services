@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+{% block header %}{% include 'default/navbars/jobseeker.html.twig' %}{% endblock %}
+
+{% block body %}
+
+    <div class="card border-primary mb-3">
+
+        <div id="deleteCvDialog" class="modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete CV</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Confirm CV deletion operation</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#"><button id="dialogDeleteCvBtn" type="button" class="btn btn-primary">Delete</button></a>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4">
+        <h1 class="display-8">User CVs</h1>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Region</th>
+                <th scope="col">District</th>
+                <th scope="col">Status</th>
+                <th scope="col">Modified</th>
+                <th scope="col">Views</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in cvs %}
+                <tr style="cursor: pointer" class="table-default clickable-row" data-href={{ path("edit_cv_page")}}{{ '?cvid='}}{{ item['id'] }}>
+                    <th scope="row">{{ item['name'] }}</th>
+                    <td>{{ item['region'] }}</td>
+                    <td>{{ item['district'] }}</td>
+                    <td>{{ item['status'] }}</td>
+                    <td>{{ item['updated'] }}</td>
+                    <td>{{ item['views'] }}</td>
+                    <td><a href="{{path('remove_cv_page')}}?cvid={{item['id']}}"><button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#deleteCvDialog" style="margin-bottom: 10px">Delete</button></a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function($) {
+
+            $(".clickable-row").click(function() {
+                window.location = $(this).data("href");
+            });
+
+            $(".clickable-row .btn-delete").click(function(e) {
+                e.preventDefault();
+                $('#deleteCvDialog').modal({ show: true})
+                $("#dialogDeleteCvBtn").parent().attr("href",$(this).parent().attr("href"));
+                return false;
+            });
+        });
+    </script>
+
+{% endblock %}
+

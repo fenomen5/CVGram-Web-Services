@@ -1,0 +1,165 @@
+{% extends 'base.html.twig' %}
+{% block header %}{% include 'default/navbars/jobseeker.html.twig' %}{% endblock %}
+{% block body %}
+
+    <div class="container">
+        <div id="error"></div>
+        <form id="cvform" action="{{ path('add_cv_page') }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="cvtitle">CV Title</label>
+                <input type="text" name="title" class="form-control" id="cvtitle" aria-describedby="cvtitle"
+                       placeholder="Enter CV Title"
+                       value="{% if usercv['cvtitle'] is defined %} {{ usercv['cvtitle'] }} {% endif %}">
+            </div>
+            <div class="form-group">
+                <select name="region" id ="region" class="custom-select">
+                    <option selected="">Select region</option>
+                    {% for item in regions %}
+                        <option {% if usercv['region'] is defined and item['id'] == usercv['region'] %} selected {% endif %}
+                                value="{{ item['id'] }}"> {{ item['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <select name="district" id="district" class="custom-select">
+                    <option selected="">Select district</option>
+                    {% for item in districts %}
+                        <option {% if usercv['district'] is defined and item['id'] == usercv['district'] %} selected {% endif %}
+                                value="{{ item['id'] }}"> {{ item['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <select name="industry" class="custom-select">
+                    <option selected="">Select industry</option>
+                    {% for item in industries %}
+                        <option {% if usercv['industry'] is defined and item['id'] == usercv['industry'] %} selected {% endif %}
+                                value="{{ item['id'] }}"> {{ item['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="cvskill">Skill</label>
+                <input type="text" name="cvskill" class="form-control" id="cvskill" aria-describedby="cvskill"
+                       placeholder="Enter skill and press add skill button">
+            </div>
+
+            <button type="button" class="btn btn-secondary" id="addSkill" style="margin-bottom: 10px">Add skill</button>
+
+            <div class="form-group">
+                <fieldset disabled="">
+                    <input class="form-control" name="skills" id="skills" type="text" placeholder="" disabled=""
+                           value="{% if usercv['cvskills'] is defined %} {{ usercv['cvskills'] }} {% endif %}">
+                </fieldset>
+            </div>
+
+            <div class="form-group">
+                <select name="cvstatus" class="custom-select">
+                    <option selected="">Choose CV status</option>
+                    {% for item in statuses %}
+                        <option {% if usercv['status'] is defined and item['id'] == usercv['status'] %} selected {% endif %}
+                                value="{{ item['id'] }}"> {{ item['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="cvattachment">File input</label>
+                <input type="file" name="cvattachment" class="form-control-file" id="cvattachment"
+                       aria-describedby="fileHelp"
+                >
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-bottom: 10px">Create CV</button>
+        </form>
+    </div>
+    <script>
+        $("#addSkill").click(function () {
+
+            $newSkill = $("#cvskill").val();
+            if ($.trim($newSkill).length > 0) {
+                $("#skills").val($("#skills").val() + $newSkill + ";");
+                $("#cvskill").val("");
+            }
+
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#cvform").submit(function (e) {
+                e.preventDefault();
+
+                var form = $(this);
+
+                var data = false;
+
+                if (window.FormData) {
+                    data = new FormData(form[0]);
+                }
+
+                $.each($(':input', form), function (i, fields) {
+                    if ($(fields).attr('name') && $(fields).val()) {
+                        data.set($(fields).attr('name'), $(fields).val());
+                    }
+                });
+
+                $.each($('input[type=file]', form)[0].files, function (i, file) {
+                    data.append(file.name, file);
+                });
+
+                /*for (var pair of data.entries()) {
+                    console.log(pair[0]+ ', ' + pair[1]);
+                }*/
+
+                $.ajax({
+                    url: form.attr('action'),
+                    data: data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'POST',
+                    success: function (data) {
+                        if ($.isPlainObject(data) && data.data == 'success') {
+                            window.location.href = '/jobseeker/dashboard';
+                        } else {
+                            $("#error").html(data);
+                        }
+                    }
+                });
+                return false;
+            });
+
+
+        });
+
+        $("#region").change(function (e) {
+
+            var isJsonResponse = false;
+            $cityId = $(this).val();
+            $.ajax({
+                url: '/districts',
+                data: 'city_id=' + $cityId,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'GET',
+                success: function (data) {
+
+                    if ($.isPlainObject(data)) {
+                        isJsonResponse = true;
+                    }
+
+                    if (isJsonResponse) {
+                        $("#district").empty();
+                        $.each(data.data, function(index, item) {
+                            $("#district").append(new Option(item.name, item.id));
+                        })
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

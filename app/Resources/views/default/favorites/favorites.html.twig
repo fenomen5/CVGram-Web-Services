@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+{% block header %}{% include 'default/navbars/employer.html.twig' %}{% endblock %}
+
+{% block body %}
+
+    <div class="card border-primary mb-3">
+
+        <hr class="my-4">
+        <h1 class="display-8">Favorite CVs</h1>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Region</th>
+                <th scope="col">District</th>
+                <th scope="col">Skills</th>
+                <th scope="col">Modified</th>
+                <th scope="col">File</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in cvs %}
+                <tr style="cursor: pointer" class="table-default clickable-row" data-href={{ path("view_cv_page")}}{{ '?cvid='}}{{item['id']}}&cvuserid={{item['userId']}}>
+                    <th scope="row">{{ item['name'] }}</th>
+                    <td>{{ item['region'] }}</td>
+                    <td>{{ item['district'] }}</td>
+                    <td>{{ item['skills'] }}</td>
+                    <td>{{ item['updated'] }}</td>
+                    {% if item['filename'] is defined and item['filename'] != '' %}
+                        <td><a href="{{path('file_download_page')}}?filename={{item['filename']}}"><button type="button" class="btn btn-info btn-file-download" style="margin-bottom: 10px">Cv file</button></a></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function($) {
+
+            $(".clickable-row").click(function() {
+                window.location = $(this).data("href");
+            });
+
+            $(".clickable-row .btn-message").click(function(e) {
+                var self = $(this);
+                e.preventDefault();
+                $('#dialogSendMessage').modal({ show: true});
+                $('#dialogSendMessageBtn')
+                    .data('href', self.parent().attr('href'));
+                return false;
+            });
+
+            $("a .badge-favorites").click(function(e) {
+                e.preventDefault();
+                var self = $(this);
+
+
+                var url = self.parent().attr('href');
+
+                $.ajax({
+                    url: url,
+                    data: '',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'GET',
+                    success: function (data) {
+
+                        if ($.isPlainObject(data)) {
+                            isJsonResponse = true;
+                            self.parent().addClass('d-none')
+                        }
+
+                        if (isJsonResponse) {
+                            $("#district").empty();
+                            $.each(data.data, function(index, item) {
+                                $("#district").append(new Option(item.name, item.id));
+                            })
+                        }
+                    }
+                });
+
+                $('#dialogSendMessageBtn')
+                    .data('href', self.parent().attr('href'));
+                return false;
+            });
+
+            $(".clickable-row a.btn-file-download").click(function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr(href),
+                    data:  '',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'GET',
+                    success: function (data) {}
+                });
+                return false;
+            });
+
+            $("#region").change(function (e) {
+
+                var isJsonResponse = false;
+                $cityId = $(this).val();
+                $.ajax({
+                    url: '/districts',
+                    data: 'city_id=' + $cityId,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'GET',
+                    success: function (data) {
+
+                        if ($.isPlainObject(data)) {
+                            isJsonResponse = true;
+                        }
+
+                        if (isJsonResponse) {
+                            $("#district").empty();
+                            $.each(data.data, function(index, item) {
+                                $("#district").append(new Option(item.name, item.id));
+                            })
+                        }
+                    }
+                });
+            });
+
+        });
+    </script>
+
+{% endblock %}
+

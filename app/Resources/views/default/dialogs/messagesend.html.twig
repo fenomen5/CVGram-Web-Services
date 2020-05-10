@@ -1,0 +1,82 @@
+{% block body %}
+
+    <div id="sendResult" class="modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Message result</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Your message has been sent successfully
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dialogSendMessage" class="modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete CV</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <textarea name="message" class="form-control" id="message" rows="3" spellcheck="false"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button id="dialogSendMessageBtn" type="button" class="btn btn-primary"
+                            data-href="{{path('send_message_page')}}?from=#sender&to=#receiver">Send</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        $(document).ready(function($) {
+
+            $("#dialogSendMessage #dialogSendMessageBtn").click(function(e) {
+                e.preventDefault();
+                data = new FormData();
+
+                url = $(this).data('href');
+
+                $.each($(':input', $('#dialogSendMessage')), function (i, fields) {
+                    if ($(fields).attr('name') && $(fields).val()) {
+                        data.set($(fields).attr('name'), $(fields).val());
+                    }
+                });
+
+                $.ajax({
+                    url: url,
+                    data:  data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'POST',
+                    success: function (data) {
+                        try {
+                            if (data.success == true) {
+                                $("#dialogSendMessage").modal('hide');
+                                $("#dialogSendMessage #message").val('');
+                                $("#sendResult").modal({show:true})
+                            }
+                        } catch (e) {
+
+                            $("#sendResult").modal({show:true})
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+{% endblock %}

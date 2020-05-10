@@ -1,0 +1,28 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+    <a class="navbar-brand" href="#">CVGram Jobseeker</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarColor01">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('jobseeker_dashboard_page') }}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{path('add_cv_page')}}">Add CV</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{path('jobseeker_feedbacks_page')}}">Feedbacks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('logout_page') }}">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('about_page') }}">About</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+</nav>

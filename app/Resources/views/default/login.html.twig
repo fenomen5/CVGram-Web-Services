@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="card bg-light">
+        {% if showErrors == true %}
+            <div class="alert alert-dismissible alert-danger" style="text-align: center">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Error!</strong>
+                {% for key, item in errors %}
+                {{ key  }} {{ item }} <br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <article class="card-body mx-auto" style="max-width: 400px;">
+            <h4 class="card-title mt-3 text-center">Log in to Account</h4>
+            <form action="{{ path('login_page') }}" method="post">
+
+                <div class="form-group input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
+                    </div>
+                    <input name="login" class="form-control" placeholder="Email address" type="email"
+                           value="{% if email%} {{ email }} {% endif %}">
+                </div> <!-- form-group// -->
+
+
+                <div class="form-group input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                    </div>
+                    <input name="password" class="form-control" placeholder="Password" type="password">
+                </div> <!-- form-group// -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block"> Login  </button>
+                </div> <!-- form-group// -->
+                <p class="text-center">Don't have an account? <a href="{{ path('register_page') }}">Register</a> </p>
+            </form>
+        </article>
+    </div> <!-- card.// -->
+
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}

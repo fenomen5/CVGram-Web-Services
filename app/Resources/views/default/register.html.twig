@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="card bg-light">
+        {% if showErrors == true %}
+            <div class="alert alert-dismissible alert-danger" style="text-align: center">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Error!</strong>
+                {% for key, item in errors %}
+                {{ key  }} {{ item }} <br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <article class="card-body mx-auto" style="max-width: 400px;">
+            <h4 class="card-title mt-3 text-center">Create Account</h4>
+            <form action="{{ path('register_page') }}" method="post">
+                <div class="form-group input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                    </div>
+                    <input name="name" class="form-control" placeholder="First name" type="text"
+                           value="{% if account['name'] is defined %} {{ account['name'] }} {% endif %}">
+                </div> <!-- form-group// -->
+                <div class="form-group input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
+                    </div>
+                    <input name="email" class="form-control" placeholder="Email address" type="email"
+                           value="{% if account['email'] is defined%} {{ account['email'] }} {% endif %}">
+                </div> <!-- form-group// -->
+                <div class="form-group input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-phone"></i> </span>
+                    </div>
+                    <input name="phone" class="form-control" placeholder="Phone number" type="text"
+                           value="{% if account['phone'] is defined%} {{ account['phone'] }} {% endif %}"
+                    >
+                </div> <!-- form-group// -->
+                <div class="form-group input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-building"></i> </span>
+                    </div>
+                    <select class="form-control" name="user_type" id="user_type">
+                        <option selected=""> Select user type</option>
+                        {% for item in user_types %}
+                            <option {% if account['user_type'] is defined and item['id'] == account['user_type']%} selected {% endif %}
+                                    value="{{ item['id'] }}"> {{ item['name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div> <!-- form-group end.// -->
+                <div class="form-group input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                    </div>
+                    <input name="password" class="form-control" placeholder="Create password" type="password">
+                </div> <!-- form-group// -->
+                <div class="form-group input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                    </div>
+                    <input name="repeat_password" class="form-control" placeholder="Repeat password" type="password">
+                </div> <!-- form-group// -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block"> Create Account  </button>
+                </div> <!-- form-group// -->
+                <p class="text-center">Have an account? <a href="{{ path('login_page') }}">Log In</a> </p>
+            </form>
+        </article>
+    </div> <!-- card.// -->
+
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+
+{% endblock %}

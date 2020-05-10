@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+{% block header %}{% include 'default/navbars/administrator.html.twig' %}{% endblock %}
+
+{% block body %}
+
+    <div class="card border-primary mb-3">
+
+        {% include 'default/dialogs/messagesend.html.twig' %}
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">CV Search</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarColor03">
+                <form class="form-inline my-2 my-lg-0" method="post" action="{{ path('administrator_dashboard_page') }}">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <ul class="navbar-nav mr-auto col-sm-6">
+                                <li class="nav-item active mt-2">
+                                    <input name="cvtitle" class="form-control mr-sm-2" type="text"
+                                           placeholder="Cv title keyword"
+                                           value="{% if searchFields['cvtitle'] is defined %}{{ searchFields['cvtitle'] }}{% endif %}">
+                                </li>
+                                <li class="nav-item mt-2">
+                                    <input name="cvskill" class="form-control mr-sm-2" type="text"
+                                           placeholder="Cv skill"
+                                           value="{% if searchFields['cvskill'] is defined %}{{ searchFields['cvskill'] }}{% endif %}">
+                                </li>
+                                <li class="nav-item mr-md-3 mt-2">
+                                    <select name="industry" class="custom-select input-sm">
+                                        <option selected="" value="">Select industry</option>
+                                        {% for item in industries %}
+                                            <option {% if searchFields['industry'] is defined and item['id'] == searchFields['industry'] %} selected {% endif %}
+                                                    value="{{ item['id'] }}"> {{ item['name'] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item mt-2 mr-md-2">
+                                <select name="region" id="region" class="custom-select">
+                                    <option selected="" value="">Select region</option>
+                                    {% for item in regions %}
+                                        <option {% if searchFields['region'] is defined
+                                            and item['id'] == searchFields['region'] %} selected
+                                        {% endif %}
+                                                value="{{ item['id'] }}"> {{ item['name'] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </li>
+                            <li class="nav-item  mt-2 mr-md-3">
+                                <select name="district" id="district" class="custom-select">
+                                    <option selected="" value="">Select district</option>
+                                    {% for item in districts %}
+                                        <option {% if searchFields['district'] is defined and
+                                            item['id'] == searchFields['district'] %} selected {% endif %}
+                                                value="{{ item['id'] }}"> {{ item['name'] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </li>
+                            <li class="nav-item mr-md-3 mt-2">
+                                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search
+                                </button>
+                            </li>
+                        </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </nav>
+        <hr class="my-4">
+        <h1 class="display-8">User CVs</h1>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Region</th>
+                <th scope="col">District</th>
+                <th scope="col">Skills</th>
+                <th scope="col">Modified</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in cvs %}
+                <tr style="cursor: pointer" class="table-default clickable-row" data-href={{ path("view_cv_page")}}{{ '?cvid='}}{{item['id']}}&cvuserid={{item['userId']}}>
+                    <th scope="row">{{ item['name'] }}</th>
+                    <td>{{ item['region'] }}</td>
+                    <td>{{ item['district'] }}</td>
+                    <td>{{ item['skills'] }}</td>
+                    <td>{{ item['updated'] }}</td>
+
+                    {% if item['blocked'] is defined and item['blocked'] != true %}
+                        <td><a href="{{path('block_cv_page')}}?cvid={{item['id']}}"><button type="button" class="btn btn-danger btn-block" style="margin-bottom: 10px">Block</button></a><br>
+                    {% else %}
+                        <td><a href="{{path('unblock_cv_page')}}?cvid={{item['id']}}"><button type="button" class="btn btn-success btn-block" style="margin-bottom: 10px">Unblock</button></a><br>
+                    {% endif %}
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function($) {
+
+            $(".clickable-row").click(function() {
+                window.location = $(this).data("href");
+            });
+
+            $("a .btn-block").click(function(e) {
+                e.preventDefault();
+                var self = $(this);
+
+                var url = self.parent().attr('href');
+
+                $.ajax({
+                    url: url,
+                    data: '',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'GET',
+                    success: function (data) {
+
+                        if ($.isPlainObject(data)) {
+                            try {
+                                if (data.success == true) {
+                                    location.reload();
+                                }
+                            } catch (err) {}
+                        }
+
+                    }
+                });
+
+                $('#dialogSendMessageBtn')
+                    .data('href', self.parent().attr('href'));
+                return false;
+            });
+
+            $("#region").change(function (e) {
+
+                var isJsonResponse = false;
+                $cityId = $(this).val();
+                $.ajax({
+                    url: '/districts',
+                    data: 'city_id=' + $cityId,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'GET',
+                    success: function (data) {
+
+                        if ($.isPlainObject(data)) {
+                            isJsonResponse = true;
+                        }
+
+                        if (isJsonResponse) {
+                            $("#district").empty();
+                            $.each(data.data, function(index, item) {
+                                $("#district").append(new Option(item.name, item.id));
+                            })
+                        }
+                    }
+                });
+            });
+
+        });
+    </script>
+
+{% endblock %}
+

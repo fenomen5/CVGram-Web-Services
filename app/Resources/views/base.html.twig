@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}CVGram{% endblock %}</title>
+        <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" />
+        <script src="{{ asset('js/jquery-3.4.1.js') }}"></script>
+        <script src="{{ asset('js/bootstrap.js') }}"></script>
+        {% block stylesheets %}
+
+        {% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ absolute_url('web/css/bootstrap.css') }}" />
+
+    </head>
+        <body>
+
+            {% block header %}{% include 'default/navbars/header.html.twig' %}{% endblock %}
+            {% block body %}{% endblock %}
+
+
+        {% block javascripts %}
+
+        {% endblock %}
+
+    </body>
+</html>
