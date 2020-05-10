@@ -1,4 +1,4 @@
-CVGram Web Services
+## CVGram Web Services
 
 A set of services to provide web interface and API for Android application that connects employees with their potential employers in a convenient way
 
